@@ -23,21 +23,6 @@
     return self;
 }
 
-/*
-- (instancetype) initWithAMDevice:(am_device *)device {
-    self = [super init];
-    if (self)
-    {
-        AMDeviceConnect(device);
-        _UDID = (__bridge NSString *) AMDeviceCopyDeviceIdentifier(device);
-        _name = (__bridge NSString *) AMDeviceCopyValue(device, 0, CFSTR("DeviceName"));
-        _model = (__bridge NSString *)  AMDeviceCopyValue(device, 0, CFSTR("HardwareModel"));
-        AMDeviceDisconnect(device);
-    }
-    return self;
-}
- */
-
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"[iOSDevice(%@) model:%@ UDID:%@]", self.name, self.model, self.UDID ];

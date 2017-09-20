@@ -7,9 +7,15 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "EBIiOSDeviceWatcher.h"
 
-@interface ViewController : NSViewController
+@interface ViewController : NSViewController<EBIiOSDeviceWatcherDelegate>
 
+@property (strong) IBOutlet NSArrayController *devicesArrayController;
+
+@property (nonatomic, strong) EBIiOSDeviceWatcher *watcher;
+
+@property (nonatomic, assign) BOOL watching;
 
 @end
 

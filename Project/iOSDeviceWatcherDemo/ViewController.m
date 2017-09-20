@@ -12,16 +12,47 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    // Do any additional setup after loading the view.
+    self.watcher = [[EBIiOSDeviceWatcher alloc] init];
+    self.watcher.delegate = self;
 }
 
-
-- (void)setRepresentedObject:(id)representedObject {
-    [super setRepresentedObject:representedObject];
-
-    // Update the view, if already loaded.
+- (BOOL)watching
+{
+    return self.watcher.isActive;
 }
 
+- (void)setWatching:(BOOL)watching
+{
+    if (watching)
+    {
+        [self.watcher startWatching];
+    }
+    else
+    {
+        [self.watcher stopWatching];
+    }
+}
+
+- (void)iosDeviceWatcherStarted:(EBIiOSDeviceWatcher *)watcher
+{
+    self.watching = self.watching;
+}
+
+- (void)iosDeviceWatcherStopped:(EBIiOSDeviceWatcher *)watcher
+{
+    self.watching = self.watching;
+}
+
+- (void)iosDeviceWatcher:(EBIiOSDeviceWatcher *)watcher didDiscoveredMobileDevice:(EBIiOSDevice *)device
+{
+    NSLog(@"Discovered: %@", device);
+    [self.devicesArrayController rearrangeObjects];
+}
+
+- (void)iosDeviceWatcher:(EBIiOSDeviceWatcher *)watcher didDisconnectedMobileDevice:(EBIiOSDevice *)device
+{
+    NSLog(@"Terminated: %@", device);
+    [self.devicesArrayController rearrangeObjects];
+}
 
 @end

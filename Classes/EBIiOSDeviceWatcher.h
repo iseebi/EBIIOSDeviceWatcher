@@ -30,6 +30,8 @@
     @property (weak) id<EBIiOSDeviceWatcherDelegate> delegate;
     @property (readonly) NSArray<EBIiOSDevice *> *devices;
     @property (readonly, getter=isActive) BOOL active;
+
+    @property (assign) BOOL allowWifi;
     
     - (void) startWatching;
     - (void) stopWatching;

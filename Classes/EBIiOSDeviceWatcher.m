@@ -24,9 +24,7 @@
 
 void EBIiOSDeviceWatcherDeviceNotificationCallback(struct am_device_notification_callback_info *info, void *refcon)
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [(__bridge EBIiOSDeviceWatcher *)refcon onDeviceNotificationCallback:info];
-    });
+    [(__bridge EBIiOSDeviceWatcher *)refcon onDeviceNotificationCallback:info];
 }
 
 @implementation EBIiOSDeviceWatcher
@@ -66,10 +64,13 @@ void EBIiOSDeviceWatcherDeviceNotificationCallback(struct am_device_notification
             
             bself.runLoop = CFRunLoopGetCurrent();
             
+            AMDSetLogLevel(5);
             AMDeviceNotificationSubscribe(&EBIiOSDeviceWatcherDeviceNotificationCallback, 0, 0, (__bridge void *)(self), &_notif);
             
             [bself.mutableDevices removeAllObjects];
-            [bself.delegate iosDeviceWatcherStarted:bself];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [bself.delegate iosDeviceWatcherStarted:bself];
+            });
             
             CFRunLoopRun();
             NSLog(@"Watching thread stop");
@@ -77,7 +78,9 @@ void EBIiOSDeviceWatcherDeviceNotificationCallback(struct am_device_notification
             bself.runLoop = NULL;
             bself.active = NO;
 
-            [bself.delegate iosDeviceWatcherStopped:bself];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [bself.delegate iosDeviceWatcherStopped:bself];
+            });
         }];
     }
     
@@ -95,13 +98,16 @@ void EBIiOSDeviceWatcherDeviceNotificationCallback(struct am_device_notification
     {
         switch (info->msg) {
             case ADNCI_MSG_CONNECTED: {
+                // skip wifi device
+                if (!self.allowWifi && (AMDeviceGetInterfaceType(info->dev) == 2)) { return; }
+                
                 EBIiOSDevice *device = [self detectDevice:info->dev];
-                NSLog(@"Connected %@", device);
+                [self onMatchedDevice:device];
                 break;
             }
             case ADNCI_MSG_DISCONNECTED: {
                 EBIiOSDevice *device = [self detectDevice:info->dev];
-                NSLog(@"Disconnected %@", device);
+                [self onTerminatedDevice:device];
                 break;
             }
             default:
@@ -116,8 +122,11 @@ void EBIiOSDeviceWatcherDeviceNotificationCallback(struct am_device_notification
         NSUInteger index = [self.mutableDevices indexOfObject:device];
         if (index != NSNotFound) { return; }
         
-        [self.mutableDevices addObject:device];
-        [self.delegate iosDeviceWatcher:self didDiscoveredMobileDevice:device];
+        __weak typeof(self) bself = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [bself.mutableDevices addObject:device];
+            [bself.delegate iosDeviceWatcher:self didDiscoveredMobileDevice:device];
+        });
     }
 
     - (void) onTerminatedDevice:(EBIiOSDevice *)device
@@ -126,10 +135,13 @@ void EBIiOSDeviceWatcherDeviceNotificationCallback(struct am_device_notification
         
         NSUInteger index = [self.mutableDevices indexOfObject:device];
         if (index == NSNotFound) { return; }
-        
-        EBIiOSDevice *disconnectDevice = [self.mutableDevices objectAtIndex:index];
-        [self.mutableDevices removeObjectAtIndex:index];
-        [self.delegate iosDeviceWatcher:self didDisconnectedMobileDevice:disconnectDevice];
+
+        __weak typeof(self) bself = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            EBIiOSDevice *disconnectDevice = [self.mutableDevices objectAtIndex:index];
+            [bself.mutableDevices removeObjectAtIndex:index];
+            [bself.delegate iosDeviceWatcher:self didDisconnectedMobileDevice:disconnectDevice];
+        });
     }
     
     //--------------------------------------------------------------------------------

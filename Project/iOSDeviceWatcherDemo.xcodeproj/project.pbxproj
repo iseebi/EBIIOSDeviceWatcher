@@ -129,6 +129,11 @@
 					82E823731F71027F00727048 = {
 						CreatedOnToolsVersion = 9.0;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
@@ -346,7 +351,6 @@
 			baseConfigurationReference = C0DA8985177D2C9751985142 /* Pods-iOSDeviceWatcherDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = iOSDeviceWatcherDemo/iOSDeviceWatcherDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = NARTSSS6TY;
@@ -366,7 +370,6 @@
 			baseConfigurationReference = 131A8432784DBF15232AA983 /* Pods-iOSDeviceWatcherDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = iOSDeviceWatcherDemo/iOSDeviceWatcherDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = NARTSSS6TY;
