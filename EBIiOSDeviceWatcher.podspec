@@ -10,11 +10,11 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/iseebi/EBIiOSDeviceWatcher.git", :tag => "#{s.version}" }
   s.source_files  = "Classes", "Classes/**/*.{h,m}"
   s.public_header_files = "Classes/**/EBI*.h"
-  s.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '$(inherits) "${PROJECT_DIR}/Pods/EBIiOSDeviceWatcher_Frameworks"' }
+  s.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '$(inherits) "${PROJECT_DIR}/Pods/EBIiOSDeviceWatcher/Frameworks"' }
   s.framework = 'MobileDevice'
   s.prepare_command = <<EOS
     SUPPORT_DIR=`find . -name 'Target Support Files' | head -n 1`
-    FRAMEWORK_DIR=`dirname "$SUPPORT_DIR"`"/EBIiOSDeviceWatcher_Frameworks"
+    FRAMEWORK_DIR=`dirname "$SUPPORT_DIR"`"/EBIiOSDeviceWatcher/Frameworks"
     mkdir -p $FRAMEWORK_DIR
     cp -r /System/Library/PrivateFrameworks/MobileDevice.framework "$FRAMEWORK_DIR/"
 EOS
