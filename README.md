@@ -1,11 +1,11 @@
 # EBIiOSDeviceWatcher
 
-Observe iOSdevice connect/disconnect on macOS.
+Observe iOS device connect/disconnect on macOS.
 
 ## How to use
 
 ```
-self.watcher = [[EBIMobileDeviceWatcher alloc] init];
+self.watcher = [[EBIiOSDeviceWatcher alloc] init];
 self.watcher.delegate = self;
 [self.watcher startWatcing];
 ```

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version      = "0.1.0"
   s.summary      = "Observe iOS device connect/disconnect on macOS."
   s.homepage     = "https://github.com/iseebi/EBIiOSDeviceWatcher"
-  s.license      = { :type => "MIT", :file => "LICENSE" }
+  s.license      = { :type => "GPLv3", :file => "LICENSE" }
   s.author       = { "Nobuhiro Ito" => "iseebi@iseteki.net" }
   s.social_media_url = "https://twitter.com/iseebi"
   s.platform     = :osx, "10.9"
