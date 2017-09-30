@@ -24,6 +24,7 @@
     @property (readwrite) BOOL active;
     @property (assign) CFRunLoopRef runLoop;
     @property (assign) am_device_notification *notif;
+    @property NSThread *runningThread;
 
     - (void) onDeviceNotificationCallback:(am_device_notification_callback_info *)info;
 
@@ -65,32 +66,37 @@ void EBIiOSDeviceWatcherDeviceNotificationCallback(struct am_device_notification
         
         self.active = YES;
         
-        __weak typeof(self) bself = self;
-        [NSThread detachNewThreadWithBlock:^{
-            NSLog(@"Watching thread start");
-            
-            bself.runLoop = CFRunLoopGetCurrent();
-            
-            AMDSetLogLevel(5);
-            AMDeviceNotificationSubscribe(&EBIiOSDeviceWatcherDeviceNotificationCallback, 0, 0, (__bridge void *)(self), &_notif);
-            
-            [bself.mutableDevices removeAllObjects];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [bself.delegate iosDeviceWatcherStarted:bself];
-            });
-            
-            CFRunLoopRun();
-            NSLog(@"Watching thread stop");
-
-            bself.runLoop = NULL;
-            bself.active = NO;
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [bself.delegate iosDeviceWatcherStopped:bself];
-            });
-        }];
+        self.runningThread = [[NSThread alloc] initWithTarget:self selector:@selector(watchingThreadAction) object:nil];
+        [self.runningThread start];
     }
-    
+
+    - (void) watchingThreadAction
+    {
+        NSLog(@"Watching thread start");
+        __weak typeof(self) bself = self;
+
+        self.runLoop = CFRunLoopGetCurrent();
+
+        AMDSetLogLevel(5);
+        AMDeviceNotificationSubscribe(&EBIiOSDeviceWatcherDeviceNotificationCallback, 0, 0, (__bridge void *)(self), &_notif);
+
+        [self.mutableDevices removeAllObjects];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate iosDeviceWatcherStarted:bself];
+        });
+
+        CFRunLoopRun();
+        NSLog(@"Watching thread stop");
+
+        self.runLoop = NULL;
+        self.active = NO;
+        self.runningThread = nil;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate iosDeviceWatcherStopped:bself];
+        });
+    }
+
     - (void)stopWatching
     {
         if (!self.isActive)
